@@ -1,19 +1,18 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser';
-import db from './database.ts';
+import db from './database';
 
 const app = express();
-const PORT = process.env.PORT || 3001; // Use env PORT for deployment
+const PORT = process.env.PORT || 3001;
 
-// Allow requests from anywhere (for deployment simplicity) or specific domains
 app.use(cors({
-    origin: '*', 
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(bodyParser.json());
+app.use(express.json());
+
 
 // Middleware to log requests
 app.use((req: Request, res: Response, next: NextFunction) => {
