@@ -2,27 +2,6 @@ import { RegisterData, Sweet, User, Address, OrderStatus } from "../types";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-/* ---------- USERS ---------- */
-
-async function getUserById(id: string): Promise<User> {
-  const res = await fetch(`${API_BASE}/api/users/${id}`);
-  if (!res.ok) {
-    throw new Error("User not found");
-  }
-  return res.json();
-}
-
-/* ---------- CART ---------- */
-
-async function clearCart(userId: string) {
-  const res = await fetch(`${API_BASE}/api/cart/${userId}`, {
-    method: "DELETE",
-  });
-  if (!res.ok) {
-    throw new Error("Failed to clear cart");
-  }
-}
-
 /* ---------- AUTH ---------- */
 
 async function register(data: RegisterData): Promise<User> {
@@ -38,7 +17,10 @@ async function register(data: RegisterData): Promise<User> {
   }
 
   const json = await res.json();
+
   localStorage.setItem("user", JSON.stringify(json.user));
+  localStorage.setItem("sb_current_user_id", json.user.id); // ✅ FIX
+
   return json.user;
 }
 
@@ -52,12 +34,16 @@ async function login(identifier: string): Promise<User> {
   if (!res.ok) throw new Error("Login failed");
 
   const json = await res.json();
+
   localStorage.setItem("user", JSON.stringify(json.user));
+  localStorage.setItem("sb_current_user_id", json.user.id); // ✅ FIX
+
   return json.user;
 }
 
 function logout() {
   localStorage.removeItem("user");
+  localStorage.removeItem("sb_current_user_id");
 }
 
 function getCurrentUser(): User | null {
@@ -65,11 +51,21 @@ function getCurrentUser(): User | null {
   return u ? JSON.parse(u) : null;
 }
 
+async function getUserById(id: string): Promise<User> {
+  const res = await fetch(`${API_BASE}/api/users/${id}`);
+  if (!res.ok) throw new Error("User not found");
+  return res.json();
+}
+
 /* ---------- SWEETS ---------- */
 
 async function getSweets(filters?: any): Promise<Sweet[]> {
-  const params = new URLSearchParams(filters || {}).toString();
+  const params = new URLSearchParams(
+    Object.entries(filters || {}).filter(([_, v]) => v !== undefined)
+  ).toString();
+
   const res = await fetch(`${API_BASE}/api/sweets?${params}`);
+  if (!res.ok) throw new Error("Failed to load sweets");
   return res.json();
 }
 
@@ -129,6 +125,10 @@ async function updateCartItemQuantity(userId: string, id: string, quantity: numb
   return res.json();
 }
 
+async function clearCart(userId: string) {
+  await fetch(`${API_BASE}/api/cart/${userId}`, { method: "DELETE" });
+}
+
 /* ---------- WISHLIST ---------- */
 
 async function getWishlist(userId: string) {
@@ -181,8 +181,7 @@ export const sweetService = {
   login,
   logout,
   getCurrentUser,
-  getUserById,     
-  clearCart,   
+  getUserById,
 
   getSweets,
   addSweet,
@@ -193,6 +192,7 @@ export const sweetService = {
   getCart,
   addToCart,
   updateCartItemQuantity,
+  clearCart,
 
   getWishlist,
   toggleWishlist,
