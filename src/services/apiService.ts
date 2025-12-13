@@ -157,13 +157,25 @@ async function createOrder(userId: string, address: Address, items: any[]) {
 }
 
 async function getOrders(user: User) {
-  const params = new URLSearchParams({
-    userId: user.id,
-    role: user.role,
-  });
-  const res = await fetch(`${API_BASE}/api/orders?${params}`);
-  return res.json();
+  if (!user) return [];
+
+  const url =
+    user.role === "ADMIN"
+      ? "/api/orders"
+      : `/api/orders/user/${user.id}`;
+
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch orders");
+  }
+
+  const data = await res.json();
+
+  // IMPORTANT: normalize response
+  return Array.isArray(data) ? data : data.orders ?? [];
 }
+
 
 async function updateOrderStatus(orderId: string, status: OrderStatus) {
   const res = await fetch(`${API_BASE}/api/orders/${orderId}/status`, {
