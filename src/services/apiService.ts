@@ -161,8 +161,8 @@ async function getOrders(user: User) {
 
   const url =
     user.role === "ADMIN"
-      ? "/api/orders"
-      : `/api/orders/user/${user.id}`;
+      ? `${API_BASE}/api/orders`
+      : `${API_BASE}/api/orders/user/${user.id}`;
 
   const res = await fetch(url);
 
@@ -172,9 +172,10 @@ async function getOrders(user: User) {
 
   const data = await res.json();
 
-  // IMPORTANT: normalize response
   return Array.isArray(data) ? data : data.orders ?? [];
 }
+
+
 
 
 async function updateOrderStatus(orderId: string, status: OrderStatus) {
