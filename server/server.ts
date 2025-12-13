@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import db from './database';
+import db from './database.js';
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
