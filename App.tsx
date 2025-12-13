@@ -70,12 +70,13 @@ const App: React.FC = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const filters = {
-        search: searchTerm,
-        category: categoryFilter,
-        minPrice: minPrice ? parseFloat(minPrice) : undefined,
-        maxPrice: maxPrice ? parseFloat(maxPrice) : undefined
-      };
+     const filters = {
+  search: searchTerm || undefined,
+  category: categoryFilter === 'All' ? undefined : categoryFilter,
+  minPrice: minPrice ? parseFloat(minPrice) : undefined,
+  maxPrice: maxPrice ? parseFloat(maxPrice) : undefined
+};
+
       
       const data = await sweetService.getSweets(filters);
       setSweets(data);
