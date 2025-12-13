@@ -1,0 +1,5 @@
+{
+  "name": "Copy of SugaryBits Sweet Shop",
+  "description": "A full-stack style React application for managing a sweet shop inventory, featuring user authentication, role-based access control (Admin/Customer), and persistent local storage state management.",
+  "requestFramePermissions": []
+}
