@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { UserRole, SweetCategory, OrderStatus } from './types.js';
-import { sweetService } from './services/mockService.js';
+//import { sweetService } from './services/mockService.ts';
+import { sweetService } from "./services/apiService";
+
 import SweetCard from './components/SweetCard.jsx';
 import AdminModal from './components/AdminModal.jsx';
 import AuthForm from './components/AuthForm.jsx';
