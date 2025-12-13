@@ -2,6 +2,26 @@ import { RegisterData, Sweet, User, Address, OrderStatus } from "../types";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
+/* ---------- USERS ---------- */
+
+async function getUserById(id: string): Promise<User> {
+  const res = await fetch(`${API_BASE}/api/users/${id}`);
+  if (!res.ok) {
+    throw new Error("User not found");
+  }
+  return res.json();
+}
+
+/* ---------- CART ---------- */
+
+async function clearCart(userId: string) {
+  const res = await fetch(`${API_BASE}/api/cart/${userId}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    throw new Error("Failed to clear cart");
+  }
+}
 
 /* ---------- AUTH ---------- */
 
@@ -161,6 +181,8 @@ export const sweetService = {
   login,
   logout,
   getCurrentUser,
+  getUserById,     
+  clearCart,   
 
   getSweets,
   addSweet,
