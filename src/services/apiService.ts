@@ -1,4 +1,4 @@
-import { RegisterData, Sweet, User, Address, PaymentDetails, OrderStatus } from "../types";
+import { RegisterData, Sweet, User, Address, OrderStatus } from "../types";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
