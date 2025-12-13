@@ -8,13 +8,14 @@ const __dirname = path.dirname(__filename);
 
 const verboseSqlite = sqlite3.verbose();
 
-// Create a database file named 'sweetshop.db' in the server directory
-const dbPath = path.resolve(__dirname, 'sweetshop.db');
+// Use a new filename to ensure a fresh DB is created with the correct columns
+const dbPath = path.resolve(__dirname, 'sugarybits.db');
+
 const db = new verboseSqlite.Database(dbPath, (err) => {
   if (err) {
     console.error('Error opening database', err);
   } else {
-    console.log('Connected to SQLite database.');
+    console.log(`Connected to SQLite database at ${dbPath}`);
     initDb();
   }
 });
@@ -30,7 +31,10 @@ function initDb() {
       firstName TEXT,
       lastName TEXT,
       role TEXT
-    )`);
+    )`, (err) => {
+      if (err) console.error("Error creating users table:", err);
+      else console.log("Users table ready.");
+    });
 
     // 2. Sweets Table (Inventory)
     db.run(`CREATE TABLE IF NOT EXISTS sweets (
@@ -84,7 +88,7 @@ function initDb() {
     )`);
 
     // Seed Initial Data if empty
-    db.get("SELECT count(*) as count FROM sweets", (err, row) => {
+    db.get("SELECT count(*) as count FROM sweets", (err: Error | null, row: any) => {
         if (row && row.count === 0) {
             const seed = [
               ['1', 'Rainbow Gummy Bears', 'Gummy', 'Soft, chewy, and bursting with fruit flavors. A classic treat for all ages.', 3.50, 100, 'https://images.unsplash.com/photo-1582058091505-f87a2e55a40f?auto=format&fit=crop&w=800&q=80'],
