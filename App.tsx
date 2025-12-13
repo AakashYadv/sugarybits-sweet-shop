@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Sweet, User, UserRole, SweetCategory, ToastMessage, ToastType, CartItem, Address, PaymentDetails, Order, OrderStatus, RegisterData } from './types.ts';
-import { sweetService } from './services/mockService.ts';
+//import { sweetService } from './services/mockService.ts';
+import { sweetService } from "./services/apiService";
 import SweetCard from './components/SweetCard.tsx';
 import AdminModal from './components/AdminModal.tsx';
 import AuthForm from './components/AuthForm.tsx';
