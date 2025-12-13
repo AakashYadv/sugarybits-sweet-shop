@@ -78,7 +78,9 @@ const App: React.FC = () => {
 };
 
       
-      const data = await sweetService.getSweets(filters);
+      //const data = await sweetService.getSweets(filters);
+      const data = await sweetService.getSweets();
+
       setSweets(data);
 
       if (user) {
