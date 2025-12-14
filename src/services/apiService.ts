@@ -156,24 +156,37 @@ async function createOrder(userId: string, address: Address, items: any[]) {
   return res.json();
 }
 
+// async function getOrders(user: User) {
+//   if (!user) return [];
+
+//   const url =
+//     user.role === "ADMIN"
+//       ? `${API_BASE}/api/orders`
+//       : `${API_BASE}/api/orders/user/${user.id}`;
+
+//   const res = await fetch(url);
+
+//   if (!res.ok) {
+//     throw new Error("Failed to fetch orders");
+//   }
+
+//   const data = await res.json();
+
+//   return Array.isArray(data) ? data : data.orders ?? [];
+// }
 async function getOrders(user: User) {
-  if (!user) return [];
+  const params = new URLSearchParams({
+    userId: user.id,
+    role: user.role,
+  });
 
-  const url =
-    user.role === "ADMIN"
-      ? `${API_BASE}/api/orders`
-      : `${API_BASE}/api/orders/user/${user.id}`;
+  const res = await fetch(`${API_BASE}/api/orders?${params.toString()}`);
 
-  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to fetch orders");
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch orders");
-  }
-
-  const data = await res.json();
-
-  return Array.isArray(data) ? data : data.orders ?? [];
+  return res.json();
 }
+
 
 
 
