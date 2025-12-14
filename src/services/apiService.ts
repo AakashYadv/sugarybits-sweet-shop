@@ -147,34 +147,74 @@ async function toggleWishlist(userId: string, sweetId: string) {
 
 /* ---------- ORDERS ---------- */
 
+// async function createOrder(userId: string, address: Address, items: any[]) {
+//   const res = await fetch(`${API_BASE}/api/orders`, {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({ userId, items, shippingAddress: address }),
+//   });
+//   return res.json();
+// }
 async function createOrder(userId: string, address: Address, items: any[]) {
+  const user = JSON.parse(localStorage.getItem("user")!);
+
+  const totalAmount = items.reduce(
+    (sum: number, i: any) => sum + i.price * i.cartQuantity,
+    0
+  );
+
   const res = await fetch(`${API_BASE}/api/orders`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId, items, shippingAddress: address }),
+    body: JSON.stringify({
+      userId,
+      username: user.username,
+      totalAmount,
+      items,
+      shippingAddress: address,
+    }),
   });
+
   return res.json();
 }
+
+
+// async function getOrders(user: User) {
+//   if (!user) return [];
+
+//   const url =
+//     user.role === "ADMIN"
+//       ? `${API_BASE}/api/orders`
+//       : `${API_BASE}/api/orders/user/${user.id}`;
+
+//   const res = await fetch(url);
+
+//   if (!res.ok) {
+//     throw new Error("Failed to fetch orders");
+//   }
+
+//   const data = await res.json();
+
+//   return Array.isArray(data) ? data : data.orders ?? [];
+// }
 
 async function getOrders(user: User) {
   if (!user) return [];
 
-  const url =
-    user.role === "ADMIN"
-      ? `${API_BASE}/api/orders`
-      : `${API_BASE}/api/orders/user/${user.id}`;
+  // backend expects query params, NOT different routes
+  const params =
+    user.role === "admin"
+      ? ""
+      : `?userId=${user.id}&role=customer`;
 
-  const res = await fetch(url);
+  const res = await fetch(`${API_BASE}/api/orders${params}`);
 
   if (!res.ok) {
     throw new Error("Failed to fetch orders");
   }
 
-  const data = await res.json();
-
-  return Array.isArray(data) ? data : data.orders ?? [];
+  return res.json();
 }
-
 
 
 
