@@ -90,46 +90,93 @@ const App: React.FC = () => {
 
   // --- Data Fetching ---
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const filters = {
-        search: searchTerm,
-        category: categoryFilter,
-        minPrice: minPrice ? parseFloat(minPrice) : undefined,
-        maxPrice: maxPrice ? parseFloat(maxPrice) : undefined
-      };
+  // const fetchData = useCallback(async () => {
+  //   setLoading(true);
+  //   try {
+  //     const filters = {
+  //       search: searchTerm,
+  //       category: categoryFilter,
+  //       minPrice: minPrice ? parseFloat(minPrice) : undefined,
+  //       maxPrice: maxPrice ? parseFloat(maxPrice) : undefined
+  //     };
       
-      const data = await sweetService.getSweets(filters);
-      setSweets(data);
+  //     const data = await sweetService.getSweets(filters);
+  //     setSweets(data);
 
-      if (user) {
-        const cartData = await sweetService.getCart(user.id);
-        const wishlistData = await sweetService.getWishlist(user.id);
-        const orderData = await sweetService.getOrders(user);
-        setCart(cartData);
-        setWishlist(wishlistData);
-        setOrders(orderData);
-      } else {
-        setCart([]);
-        setWishlist([]);
-        setOrders([]);
-      }
+  //     if (user) {
+  //       const cartData = await sweetService.getCart(user.id);
+  //       const wishlistData = await sweetService.getWishlist(user.id);
+  //       const orderData = await sweetService.getOrders(user);
+  //       setCart(cartData);
+  //       setWishlist(wishlistData);
+  //       setOrders(orderData);
+  //     } else {
+  //       setCart([]);
+  //       setWishlist([]);
+  //       setOrders([]);
+  //     }
 
-    } catch (error) {
-      console.error("Failed to fetch data", error);
-      // Don't show error toast on first load race conditions
-    } finally {
-      setLoading(false);
-    }
-  }, [searchTerm, categoryFilter, minPrice, maxPrice, user]);
+  //   } catch (error) {
+  //     console.error("Failed to fetch data", error);
+  //     // Don't show error toast on first load race conditions
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }, [searchTerm, categoryFilter, minPrice, maxPrice, user]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchData();
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [fetchData]);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     fetchData();
+  //   }, 400);
+  //   return () => clearTimeout(timer);
+  // }, [fetchData]);
+
+  const fetchData = useCallback(async () => {
+  setLoading(true);
+
+  try {
+    // 1️⃣ sweets must NEVER depend on user APIs
+    const filters = {
+      search: searchTerm,
+      category: categoryFilter,
+      minPrice: minPrice ? parseFloat(minPrice) : undefined,
+      maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+    };
+
+    const sweetsData = await sweetService.getSweets(filters);
+    setSweets(sweetsData);
+  } catch (e) {
+    console.error("Failed to load sweets", e);
+    setSweets([]);
+  }
+
+  if (!user) {
+    setCart([]);
+    setWishlist([]);
+    setOrders([]);
+    setLoading(false);
+    return;
+  }
+
+  // 2️⃣ user-related APIs must be isolated
+  try {
+    const [cartData, wishlistData, ordersData] = await Promise.all([
+      sweetService.getCart(user.id),
+      sweetService.getWishlist(user.id),
+      sweetService.getOrders(user),
+    ]);
+
+    setCart(cartData);
+    setWishlist(wishlistData);
+    setOrders(ordersData);
+  } catch (e) {
+    console.error("User data fetch failed", e);
+    // IMPORTANT: do NOT touch sweets here
+  }
+
+  setLoading(false);
+}, [searchTerm, categoryFilter, minPrice, maxPrice, user]);
+
 
   // --- Handlers ---
 
