@@ -87,6 +87,51 @@ const App: React.FC = () => {
     };
     checkSession();
   }, []);
+  const fetchData = useCallback(async () => {
+  setLoading(true);
+
+  // 1️⃣ LOAD SWEETS FIRST (ALWAYS)
+  try {
+    const filters = {
+      search: searchTerm || undefined,
+      category: categoryFilter !== "All" ? categoryFilter : undefined,
+      minPrice: minPrice ? parseFloat(minPrice) : undefined,
+      maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+    };
+
+    const sweetsData = await sweetService.getSweets(filters);
+    setSweets(sweetsData);
+  } catch (e) {
+    console.error("Failed to load sweets", e);
+    setSweets([]);
+  }
+
+  // 2️⃣ USER DATA ONLY IF LOGGED IN
+  if (!user) {
+    setCart([]);
+    setWishlist([]);
+    setOrders([]);
+    setLoading(false);
+    return;
+  }
+
+  try {
+    const [cartData, wishlistData, ordersData] = await Promise.all([
+      sweetService.getCart(user.id),
+      sweetService.getWishlist(user.id),
+      sweetService.getOrders(user),
+    ]);
+
+    setCart(cartData);
+    setWishlist(wishlistData);
+    setOrders(ordersData);
+  } catch (e) {
+    console.error("User data fetch failed", e);
+    // ❗ DO NOT TOUCH SWEETS HERE
+  }
+
+  setLoading(false);
+}, [searchTerm, categoryFilter, minPrice, maxPrice, user]);
 
   // --- Data Fetching ---
 
@@ -131,8 +176,8 @@ const App: React.FC = () => {
   //   return () => clearTimeout(timer);
   // }, [fetchData]);
 
-  const fetchData = useCallback(async () => {
-  setLoading(true);
+  // const fetchData = useCallback(async () => {
+  // setLoading(true);
 
   try {
     // 1️⃣ sweets must NEVER depend on user APIs
