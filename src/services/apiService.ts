@@ -183,7 +183,7 @@ async function getOrders(user: User) {
   if (!user) return [];
 
   const url =
-    user.role === "admin"
+    user.role === "ADMIN"
       ? `${API_BASE}/api/orders`
       : `${API_BASE}/api/orders/user/${user.id}`;
 
