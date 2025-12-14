@@ -176,51 +176,7 @@ const App: React.FC = () => {
   //   return () => clearTimeout(timer);
   // }, [fetchData]);
 
-  // const fetchData = useCallback(async () => {
-  // setLoading(true);
-
-//   try {
-//     // 1️⃣ sweets must NEVER depend on user APIs
-//     const filters = {
-//       search: searchTerm,
-//       category: categoryFilter,
-//       minPrice: minPrice ? parseFloat(minPrice) : undefined,
-//       maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
-//     };
-
-//     const sweetsData = await sweetService.getSweets(filters);
-//     setSweets(sweetsData);
-//   } catch (e) {
-//     console.error("Failed to load sweets", e);
-//     setSweets([]);
-//   }
-
-//   if (!user) {
-//     setCart([]);
-//     setWishlist([]);
-//     setOrders([]);
-//     setLoading(false);
-//     return;
-//   }
-
-//   // 2️⃣ user-related APIs must be isolated
-//   try {
-//     const [cartData, wishlistData, ordersData] = await Promise.all([
-//       sweetService.getCart(user.id),
-//       sweetService.getWishlist(user.id),
-//       sweetService.getOrders(user),
-//     ]);
-
-//     setCart(cartData);
-//     setWishlist(wishlistData);
-//     setOrders(ordersData);
-//   } catch (e) {
-//     console.error("User data fetch failed", e);
-//     // IMPORTANT: do NOT touch sweets here
-//   }
-
-//   setLoading(false);
-// }, [searchTerm, categoryFilter, minPrice, maxPrice, user]);
+ 
 const fetchData = useCallback(async () => {
   setLoading(true);
 
